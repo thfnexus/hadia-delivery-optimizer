@@ -28,12 +28,16 @@ st.set_page_config(
     page_title="Delivery Scheduling & Cost Optimizer",
     page_icon="🚚",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
 
-# Custom Styling
+# Custom Styling (Desktop + Mobile Responsive)
 st.markdown("""
 <style>
+    .block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
     .metric-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -41,12 +45,14 @@ st.markdown("""
         padding: 16px;
         text-align: center;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        margin-bottom: 10px;
     }
     .metric-card h3 {
         margin: 0;
-        font-size: 24px;
+        font-size: 22px;
         color: #0f172a;
         font-weight: 700;
+        word-break: break-word;
     }
     .metric-card p {
         margin: 4px 0 0 0;
@@ -56,11 +62,54 @@ st.markdown("""
     }
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
+        flex-wrap: wrap;
     }
     .stTabs [data-baseweb="tab"] {
-        padding: 8px 20px;
+        padding: 8px 16px;
         border-radius: 6px;
         font-weight: 600;
+        white-space: nowrap;
+    }
+    iframe, .element-container iframe {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    @media (max-width: 768px) {
+        .block-container {
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+            padding-top: 1rem !important;
+        }
+        h1 {
+            font-size: 1.5rem !important;
+        }
+        h2, h3 {
+            font-size: 1.2rem !important;
+        }
+        .metric-card {
+            padding: 12px 10px;
+            margin-bottom: 8px;
+        }
+        .metric-card h3 {
+            font-size: 18px;
+        }
+        .metric-card p {
+            font-size: 12px;
+        }
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 4px;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+        .stTabs [data-baseweb="tab"] {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        iframe, .element-container iframe {
+            height: 360px !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -216,12 +265,11 @@ with tab_map:
         # 1. Interactive Map Display
         fmap = create_folium_route_map(depot, opt["vehicle_routes"], orders)
         if fmap:
-            # Use streamlit_folium for reliable rendering (no CartoDB injection)
+            # Use streamlit_folium with full container width for mobile + desktop
             try:
                 from streamlit_folium import st_folium
-                st_folium(fmap, width=None, height=500, returned_objects=[])
-            except ImportError:
-                # Fallback: render raw HTML
+                st_folium(fmap, use_container_width=True, height=480, returned_objects=[])
+            except Exception:
                 st.html(fmap._repr_html_())
 
         st.divider()
