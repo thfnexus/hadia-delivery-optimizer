@@ -35,13 +35,20 @@ def create_folium_route_map(
     depot_lat = float(depot.get("latitude", 31.5204))
     depot_lon = float(depot.get("longitude", 74.3587))
 
-    # Official OpenStreetMap (100% free, no key, no watermark, completely open source)
+    # Create map with NO default tiles, then add OpenStreetMap manually
+    # This prevents folium from injecting CartoDB/paid tiles
     fmap = folium.Map(
         location=[depot_lat, depot_lon],
         zoom_start=12,
-        tiles="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        attr="&copy; OpenStreetMap contributors"
+        tiles=None  # Disable ALL default tiles
     )
+    # Add official OpenStreetMap tiles explicitly (100% free, no API key)
+    folium.TileLayer(
+        tiles="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attr="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+        name="OpenStreetMap",
+        control=False
+    ).add_to(fmap)
 
     # 1. Add Depot Marker (Central Warehouse)
     depot_popup = f"""
