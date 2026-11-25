@@ -1,0 +1,25 @@
+# Delivery Scheduling and Cost Optimizer
+# Git version control - ignore large binaries and local env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# SQLite database (regenerated on startup)
+*.db
+*.sqlite
+
+# OS / IDE junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local secrets / keys
+.env
+*.env
+
+# Streamlit local config (server address is localhost)
+.streamlit/credentials.toml
