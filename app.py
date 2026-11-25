@@ -4,7 +4,6 @@ Automated Multi-Vehicle Routing with Cargo Capacity & Time Restrictions (CVRPTW)
 """
 
 import streamlit as st
-import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import os
@@ -217,8 +216,13 @@ with tab_map:
         # 1. Interactive Map Display
         fmap = create_folium_route_map(depot, opt["vehicle_routes"], orders)
         if fmap:
-            # Render via standard HTML component (100% reliable)
-            components.html(fmap._repr_html_(), height=500, scrolling=False)
+            # Use streamlit_folium for reliable rendering (no CartoDB injection)
+            try:
+                from streamlit_folium import st_folium
+                st_folium(fmap, width=None, height=500, returned_objects=[])
+            except ImportError:
+                # Fallback: render raw HTML
+                st.html(fmap._repr_html_())
 
         st.divider()
 
@@ -282,7 +286,7 @@ with tab_finance:
         st.markdown("#### 🚚 Vehicle-by-Vehicle Cost & Utilization Breakdown")
         if fin.get("per_vehicle_breakdown"):
             v_df = pd.DataFrame(fin["per_vehicle_breakdown"])
-            v_df.rename(columns={
+            v_df = v_df.rename(columns={
                 "vehicle_name": "Vehicle",
                 "vehicle_type": "Type",
                 "orders_delivered": "Deliveries",
@@ -293,7 +297,7 @@ with tab_finance:
                 "total_cost_pkr": "Total Cost (PKR)",
                 "max_capacity_kg": "Capacity (kg)",
                 "max_load_carried_kg": "Max Load (kg)"
-            }, inplace=True)
+            })
             st.dataframe(v_df[["Vehicle", "Type", "Deliveries", "Distance (km)", "Fuel (L)", "Fuel Cost (PKR)", "Total Cost (PKR)", "Capacity (kg)", "Max Load (kg)"]], use_container_width=True)
 
 
